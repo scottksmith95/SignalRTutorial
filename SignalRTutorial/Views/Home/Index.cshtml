@@ -1,0 +1,52 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script src="~/Scripts/jquery-1.6.4.js"></script>
+    <script src="~/Scripts/jquery.signalR-0.5.3.js"></script>
+    <script src="/SignalR/Hubs"></script>
+</head>
+<body>
+    <div>
+        <input id="newTagText" type="text" placeholder="Enter a new tag" />
+        <input id="newTagSubmit" type="submit" value="Add new tag" />
+    </div>
+
+    <ul id="tags"></ul>
+
+    <script type="text/javascript">
+        $(function () {
+            var tagHub = $.connection.tagHub;
+
+            tagHub.initTags = function (tags) {
+                $.each(tags, function (index, value) {
+                    $('#tags').append('<li>' + value + '</li>');
+                });
+            };
+
+            tagHub.addTag = function (tag) {
+                $('#tags').append('<li>' + tag + '</li>');
+            };
+
+            $('#newTagSubmit').click(function () {
+                var tag = $('#newTagText').attr('value');
+                tagHub.setTag(tag);
+            });
+
+            $.connection.hub.start()
+                .done(function () {
+                    tagHub.getTags();
+                })
+                .fail(function () {
+                    alert("Could not Connect!");
+                });
+        });
+    </script>
+</body>
+</html>
